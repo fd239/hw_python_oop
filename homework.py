@@ -1,11 +1,11 @@
 import datetime as dt
 
 class Calculator:
-    def __init__(self, limit):
+    def __init__(self,limit):
         self.limit = limit
         self.records = []
 
-    def add_record(self, Record):
+    def add_record(self,Record):
         self.records.append(Record)
 
     def get_today_stats(self):
@@ -15,13 +15,13 @@ class Calculator:
         return sum([x.amount for x in self.records if x.date >= (dt.datetime.now().date() - dt.timedelta(7)) and x.date <= dt.datetime.now().date()])
 
 class CashCalculator(Calculator):
-    def __init__(self, limit):
+    def __init__(self,limit):
         super().__init__(limit)
 
     USD_RATE = float(76)
     EURO_RATE = float(82)
 
-    def get_today_cash_remained(self, currency):
+    def get_today_cash_remained(self,currency):
 
         currency_dict = {
             'usd': 'USD',
@@ -32,23 +32,23 @@ class CashCalculator(Calculator):
         spend_sum = self.get_today_stats()
 
         if currency.lower() == "usd": 
-            course = self.USD_RATE
+            rate = self.USD_RATE
         elif currency.lower() == "eur":
-            course = self.EURO_RATE 
+            rate = self.EURO_RATE 
         elif currency.lower() == 'rub':
-            course = 1        
+            rate = 1        
         else: 
             return 'Курс валюты не определен'
 
         if spend_sum < self.limit:
-            return  f'На сегодня осталось {round((self.limit - spend_sum) / course, 2)} {currency_dict[currency.lower()]}'
+            return  f'На сегодня осталось {round((self.limit - spend_sum) / rate, 2)} {currency_dict[currency.lower()]}'
         elif spend_sum == self.limit:
             return 'Денег нет, держись'
         elif spend_sum > self.limit:
-            return f'Денег нет, держись: твой долг - {round((spend_sum - self.limit) / course, 2)} {currency_dict[currency.lower()]}'
+            return f'Денег нет, держись: твой долг - {round((spend_sum - self.limit) / rate, 2)} {currency_dict[currency.lower()]}'
 
 class CaloriesCalculator(Calculator):
-    def __init__(self, limit):
+    def __init__(self,limit):
         super().__init__(limit)
 
     def get_calories_remained(self):
@@ -56,16 +56,17 @@ class CaloriesCalculator(Calculator):
         spend_sum = self.get_today_stats()
 
         if spend_sum < self.limit:
-            return 'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более ' + str(self.limit - spend_sum) + ' кКал'
+            return f'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более {str(self.limit - spend_sum)} кКал'
         else:
             return 'Хватит есть!'
 
 class Record:
-    def __init__(self, amount, comment, date = ''):
+    def __init__(self,amount,comment,date=''):
 
         self.comment = comment
 
-        assert amount > 0, 'Сумма должна быть положительной!'
+        if amount < 0:
+            raise ValueError('Сумма должна быть положительной')
         
         self.amount = amount
         
